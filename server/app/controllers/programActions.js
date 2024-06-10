@@ -26,9 +26,31 @@ const programs = [
 // Declare the action
 
 const browse = (req, res) => {
-  res.json(programs);
+  if (req.query.q != null) {
+    const filteredPrograms = programs.filter((program) =>
+      program.synopsis.includes(req.query.q)
+    );
+    if (filteredPrograms.length === 0) {
+      res.send("Aucun film ne correspond à votre recherche");
+    } else {
+      res.json(filteredPrograms);
+    }
+  } else {
+    res.json(programs);
+  }
 };
 
+const read = (req, res) => {
+  const parsedId = parseInt(req.params.id, 10);
+
+  const program = programs.find((el) => el.id === parsedId);
+
+  if (program != null) {
+    res.json(program);
+  } else {
+    res.send("Aucun film ne correspond à la recherche").Status(404);
+  }
+};
 // Export it to import it somewhere else
 
-module.exports = { browse };
+module.exports = { browse, read };
