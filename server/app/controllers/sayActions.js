@@ -1,6 +1,5 @@
 const sayWelcome = (req, res) => {
-  console.info(req.query);
-  res.send(`Welcome to Wild Series !`);
+  res.send("Hello from greetings controller !");
 };
 
 module.exports = { sayWelcome };

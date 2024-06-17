@@ -2,13 +2,13 @@ const express = require("express");
 
 const router = express.Router();
 
-const { sayWelcome } = require("../../controllers/sayActions");
-
-router.get("/", sayWelcome);
-
 /* ************************************************************************* */
 // Import And Use Routers Here
 /* ************************************************************************* */
+const sayactionsRouter = require("./sayactions/router");
+
+router.use("/sayhello", sayactionsRouter);
+
 const categoriesRouter = require("./categories/router");
 
 router.use("/categories", categoriesRouter);

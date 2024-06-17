@@ -1,54 +1,36 @@
 // Some data to make the trick
-
-const programs = [
-  {
-    id: 1,
-    title: "The Good Place",
-    synopsis:
-      "À sa mort, Eleanor Shellstrop est envoyée au Bon Endroit, un paradis fantaisiste réservé aux individus exceptionnellement bienveillants. Or Eleanor n'est pas exactement une « bonne personne » et comprend vite qu'il y a eu erreur sur la personne. Avec l'aide de Chidi, sa prétendue âme sœur dans l'au-delà, la jeune femme est bien décidée à se redécouvrir.",
-    poster:
-      "https://img.betaseries.com/JwRqyGD3f9KvO_OlfIXHZUA3Ypw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2F94857341d71c795c69b9e5b23c4bf3e7.jpg",
-    country: "USA",
-    year: 2016,
-  },
-  {
-    id: 2,
-    title: "Dark",
-    synopsis:
-      "Quatre familles affolées par la disparition d'un enfant cherchent des réponses et tombent sur un mystère impliquant trois générations qui finit de les déstabiliser.",
-    poster:
-      "https://img.betaseries.com/zDxfeFudy3HWjxa6J8QIED9iaVw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2Fc47135385da176a87d0dd9177c5f6a41.jpg",
-    country: "Allemagne",
-    year: 2017,
-  },
-];
+const tables = require("../../database/tables");
 
 // Declare the action
 
-const browse = (req, res) => {
-  if (req.query.q != null) {
-    const filteredPrograms = programs.filter((program) =>
-      program.synopsis.includes(req.query.q)
-    );
-    if (filteredPrograms.length === 0) {
-      res.send("Aucun film ne correspond à votre recherche");
-    } else {
-      res.json(filteredPrograms);
-    }
-  } else {
-    res.json(programs);
+const browse = async (req, res, next) => {
+  try {
+    // Fetch all programs from the database
+    const programs = await tables.program.readAll();
+
+    // Respond with the programs in JSON format
+    res.status(200).json(programs);
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
   }
 };
 
-const read = (req, res) => {
-  const parsedId = parseInt(req.params.id, 10);
+const read = async (req, res, next) => {
+  try {
+    // Fetch a specific program from the database based on the provided ID
+    const program = await tables.program.read(req.params.id);
 
-  const program = programs.find((el) => el.id === parsedId);
-
-  if (program != null) {
-    res.json(program);
-  } else {
-    res.send("Aucun film ne correspond à la recherche").Status(404);
+    // If the program is not found, respond with HTTP 404 (Not Found)
+    // Otherwise, respond with the program in JSON format
+    if (program == null) {
+      res.sendStatus(404);
+    } else {
+      res.status(200).json(program);
+    }
+  } catch (err) {
+    // Pass any errors to the error-handling middleware
+    next(err);
   }
 };
 // Export it to import it somewhere else
